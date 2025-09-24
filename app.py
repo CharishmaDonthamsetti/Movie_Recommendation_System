@@ -1,18 +1,15 @@
-# app.py (Movie Recommendation System - Modern Dark Lavender UI)
 import streamlit as st
 import pickle
 import pandas as pd
 import os
 import re
 
-# ---------- Config ----------
 MODEL_FILE = "model.pkl"
 MOVIES_CSV = "movies.csv"
 RATINGS_CSV = "ratings.csv"
 
 st.set_page_config(page_title="Movie Recommendation System", page_icon="🎬", layout="wide")
 
-# ---------- Helpers ----------
 def get_year_from_title(title):
     m = re.search(r'\((\d{4})\)', str(title))
     return m.group(1) if m else "N/A"
@@ -61,7 +58,7 @@ def get_recommendations(selected_movie, model, movie_user_matrix_sparse, movies_
     return recs
 
 def similarity_badge(similarity: float) -> str:
-    """Return colored badge for similarity score"""
+
     if similarity >= 75:
         color = "#8e44ad"   # lavender
     elif similarity >= 50:
@@ -82,7 +79,7 @@ def similarity_badge(similarity: float) -> str:
         </span>
     """
 
-# ---------- Load model ----------
+
 if not os.path.exists(MODEL_FILE):
     st.error(f"Missing '{MODEL_FILE}'. Put model.pkl in this folder.")
     st.stop()
@@ -101,7 +98,7 @@ if os.path.exists(RATINGS_CSV):
     except Exception as e:
         st.warning("Could not read ratings.csv — avg rating/popularity disabled. " + str(e))
 
-# ---------- Custom CSS ----------
+
 st.markdown(
     """
     <style>
@@ -211,11 +208,10 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# ---------- UI ----------
 st.markdown("<h1 style='text-align:center; color:#9b59b6;'>🎬 Movie Recommendation System</h1>", unsafe_allow_html=True)
 st.caption("Offline recommendations with a modern dark lavender interface ✨")
 
-# Sidebar
+
 st.sidebar.header("🏠 Home")
 st.sidebar.subheader("Search Movies")
 search_input = st.sidebar.text_input("Search a movie:")
@@ -224,13 +220,13 @@ selected_movie = st.sidebar.selectbox("Select a movie:", filtered_movies["title"
 st.sidebar.markdown("### Select number of recommendations")
 top_n = st.sidebar.slider("", 4, 20, 8)
 
-# Quick stats
+
 col1, col2, col3 = st.columns(3)
 col1.metric("🎞️ Total movies", len(movies))
 col2.metric("👥 Users", movie_user_matrix_sparse.shape[1])
 col3.metric("⭐ Ratings stored", movie_user_matrix_sparse.nnz)
 
-# Recommendations
+
 if st.sidebar.button("Show Recommendations 🚀"):
     with st.spinner("Finding the best matches..."):
         recs = get_recommendations(selected_movie, model, movie_user_matrix_sparse, movies, movie_to_idx, top_n=top_n)
@@ -253,7 +249,7 @@ if st.sidebar.button("Show Recommendations 🚀"):
                     unsafe_allow_html=True
                 )
 
-# Insights (offline)
+
 with st.expander("📊 Insights (offline)"):
     try:
         all_genres = movies["genres"].dropna().str.split("|").explode()
@@ -271,3 +267,4 @@ with st.expander("📊 Insights (offline)"):
         st.table(top_popular[["title", "rating_count", "avg_rating"]])
     else:
         st.write("ratings.csv not present — place it in the folder to enable popularity stats.")
+
